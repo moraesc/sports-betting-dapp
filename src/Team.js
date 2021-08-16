@@ -2,12 +2,10 @@ import React from 'react';
 import getWeb3 from './utils/getWeb3';
 import BettingContract from './contracts/Betting.json';
 import './App.css';
-import { ethers } from 'ethers'
 
 const contract = require('truffle-contract');
 
-class TeamA extends React.Component {
-
+class Team extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -21,6 +19,11 @@ class TeamA extends React.Component {
         this.bet = this.bet.bind(this);
         this.make_win = this.make_win.bind(this);
         this.handle_input_change = this.handle_input_change.bind(this);
+    }
+
+    team_letter_to_number = {
+        A: 1,
+        B: 2
     }
 
     componentDidMount(){
@@ -47,9 +50,9 @@ class TeamA extends React.Component {
             Betting.deployed().then((instance) => {
                 BettingInstance = instance;
             }).then((result) => {
-                return(BettingInstance.bet(1, {from: accounts[0], value: this.state.input_amount}));
+                return(BettingInstance.bet(this.team_letter_to_number[this.props.team], {from: accounts[0], value: this.state.input_amount}));
             }).catch(() => {
-                console.log("Error with betting");
+                console.log('Error with betting');
             })
         })
     }
@@ -67,7 +70,14 @@ class TeamA extends React.Component {
             Betting.deployed().then((instance) => {
                 BettingInstance = instance;
             }).then((result) => {
-                return(BettingInstance.amountOne.call({from: accounts[0]}));
+                switch (this.props.team) {
+                    case 'A':
+                        return(BettingInstance.amountOne.call({from: accounts[0]}));
+                    case 'B':
+                        return(BettingInstance.amounntTwo.call({from: accounts[0]}));
+                    default:
+                        break;
+                }
             }).then((result) => {
                 this.setState({amount: result.c/1000})
             })
@@ -84,7 +94,7 @@ class TeamA extends React.Component {
             Betting.deployed().then((instance) => {
                 BettingInstance = instance;
             }).then((result) => {
-                return(BettingInstance.distributePrizes(1, {from: accounts[0]}));
+                return(BettingInstance.distributePrizes(this.team_letter_to_number[this.props.team], {from: accounts[0]}));
             }).catch(() => {
                 console.log('Error with distributing prizes');
             })
@@ -100,7 +110,7 @@ class TeamA extends React.Component {
     render() {
         return(
             <div>
-                <h3>Team A</h3>
+                <h3>Team {this.props.team}</h3>
                 <p>Total amount: {this.state.amount}</p>
                 <p>Enter an amount to bet: </p>
                 <input type='text' onChange={this.handle_input_change} required pattern='[0-9]*[.,][0-9]*'></input>
@@ -114,4 +124,4 @@ class TeamA extends React.Component {
     }
 }
 
-export default TeamA;
+export default Team;

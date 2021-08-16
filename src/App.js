@@ -1,10 +1,8 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 import getWeb3 from './utils/getWeb3.js';
-import TeamA from './TeamA.js';
-import TeamB from './TeamB.js';
+import Team from './Team.js';
 
 class App extends React.Component {
 
@@ -15,6 +13,8 @@ class App extends React.Component {
       address: ''
     }
   }
+
+  teams = ['A', 'B'];
 
   componentDidMount() {
     getWeb3.then(results => {
@@ -37,12 +37,11 @@ class App extends React.Component {
             Welcome to my Ethereum Betting App. Your wallet address is {this.state.address}
           </p>
         </header>
-        <div className='team-a'>
-          <TeamA />
-        </div>
-        <div className='team-b'>
-          {/* <TeamB /> */}
-        </div>
+        {this.teams.map((team) => (
+          <div className='team'>
+            <Team team={team} />
+          </div>
+        ))}
       </div>
     );
   }
